@@ -28,6 +28,8 @@ export interface Order {
     state: string;
     zip: string;
   };
+  laborCost?: number; // Labor cost incurred during fulfillment
+  warehouseId: string; // Multi-warehouse mapping
 }
 
 export interface EngineConfig {
@@ -50,6 +52,8 @@ export interface InventoryItem {
     bin: string;
   };
   lastUpdated: Date;
+  warehouseId: string; // Multi-warehouse mapping
+  runwayDays?: number; // Predictive inventory runway
 }
 
 export type StaffRole = 'picker' | 'packer' | 'supervisor';
@@ -63,6 +67,8 @@ export interface Staff {
   currentTask?: string;
   ordersCompleted: number;
   efficiency: number;
+  hourlyRate: number; // For labor cost calculations
+  warehouseId: string; // Multi-warehouse mapping
 }
 
 export interface LogEntry {

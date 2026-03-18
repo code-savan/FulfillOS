@@ -22,37 +22,41 @@ const logTypeColors: Record<string, string> = {
 
 export default function DashboardPage() {
   const navigate = useNavigate();
-  const { orders, items, staff, logs } = useStore();
+  const { orders, items, staff, logs, currentWarehouseId, setCurrentWarehouse } = useStore();
+
+  const filteredOrders = orders.filter(o => o.warehouseId === currentWarehouseId);
+  const filteredItems = items.filter(i => i.warehouseId === currentWarehouseId);
+  const filteredStaff = staff.filter(s => s.warehouseId === currentWarehouseId);
 
   // Calculate KPIs
-  const ordersToday = orders.filter(o => {
+  const ordersToday = filteredOrders.filter(o => {
     const today = new Date();
     const orderDate = new Date(o.createdAt);
     return today.toDateString() === orderDate.toDateString();
   }).length;
 
-  const fulfillmentRate = orders.length > 0 
-    ? Math.round((orders.filter(o => o.status === 'shipped').length / orders.length) * 100) 
+  const fulfillmentRate = filteredOrders.length > 0 
+    ? Math.round((filteredOrders.filter(o => o.status === 'shipped').length / filteredOrders.length) * 100) 
     : 0;
 
-  const activeStaff = staff.filter(s => s.status === 'active').length;
-  const lowStockCount = items.filter(i => i.stock <= i.minStock).length;
+  const activeStaff = filteredStaff.filter(s => s.status === 'active').length;
+  const lowStockCount = filteredItems.filter(i => i.stock <= i.minStock).length;
 
   const kpis = [
-    { label: 'Orders Today', value: ordersToday.toString(), change: 12 },
+    { label: 'Node Orders', value: ordersToday.toString(), change: 12 },
     { label: 'Fulfillment Rate', value: `${fulfillmentRate}%`, change: 3.2 },
-    { label: 'Active Staff', value: `${activeStaff}/${staff.length}`, change: 0 },
+    { label: 'Node Staff', value: `${activeStaff}/${filteredStaff.length}`, change: 0 },
     { label: 'Low Stock SKUs', value: lowStockCount.toString(), change: -2 },
   ];
 
-  const recentOrders = orders.slice(0, 5);
+  const recentOrders = filteredOrders.slice(0, 5);
   const recentLogs = logs.slice(0, 8);
 
   const pipelineColumns: { status: OrderStatus; title: string; count: number }[] = [
-    { status: 'pending', title: 'Pending', count: orders.filter(o => o.status === 'pending').length },
-    { status: 'picking', title: 'Picking', count: orders.filter(o => o.status === 'picking').length },
-    { status: 'packing', title: 'Packing', count: orders.filter(o => o.status === 'packing').length },
-    { status: 'shipped', title: 'Shipped', count: orders.filter(o => o.status === 'shipped').length },
+    { status: 'pending', title: 'Pending', count: filteredOrders.filter(o => o.status === 'pending').length },
+    { status: 'picking', title: 'Picking', count: filteredOrders.filter(o => o.status === 'picking').length },
+    { status: 'packing', title: 'Packing', count: filteredOrders.filter(o => o.status === 'packing').length },
+    { status: 'shipped', title: 'Shipped', count: filteredOrders.filter(o => o.status === 'shipped').length },
   ];
 
   return (
@@ -76,16 +80,33 @@ export default function DashboardPage() {
                     </p>
                 </div>
                 
-                {/* Engine Health Dial */}
-                <div className="border border-black p-4 min-w-[240px] bg-gray-50 flex flex-col items-center justify-center text-center">
-                    <div className="flex items-center gap-2 mb-2">
-                        <div className={`w-3 h-3 rounded-full animate-pulse ${useStore.getState().isEngineActive ? 'bg-green-500' : 'bg-red-500'}`} />
-                        <span className="text-[10px] font-black uppercase tracking-widest">Engine Status</span>
+                <div className="flex flex-col gap-3">
+                    <div className="flex gap-2">
+                        <button 
+                            onClick={() => setCurrentWarehouse('WH-01')}
+                            className={`px-4 py-2 border-2 border-black font-black uppercase text-[10px] transition-all ${currentWarehouseId === 'WH-01' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-50'}`}
+                        >
+                            Node 01
+                        </button>
+                        <button 
+                            onClick={() => setCurrentWarehouse('WH-02')}
+                            className={`px-4 py-2 border-2 border-black font-black uppercase text-[10px] transition-all ${currentWarehouseId === 'WH-02' ? 'bg-black text-white' : 'bg-white text-black hover:bg-gray-50'}`}
+                        >
+                            Node 02
+                        </button>
                     </div>
-                    <div className="text-2xl font-black uppercase tracking-tighter">
-                        {useStore.getState().isEngineActive ? 'Autonomous' : 'Manual Mode'}
+                    
+                    {/* Engine Health Dial */}
+                    <div className="border border-black p-4 min-w-[240px] bg-gray-50 flex flex-col items-center justify-center text-center">
+                        <div className="flex items-center gap-2 mb-2">
+                            <div className={`w-3 h-3 rounded-full animate-pulse ${useStore.getState().isEngineActive ? 'bg-green-500' : 'bg-red-500'}`} />
+                            <span className="text-[10px] font-black uppercase tracking-widest">Engine Status</span>
+                        </div>
+                        <div className="text-2xl font-black uppercase tracking-tighter">
+                            {useStore.getState().isEngineActive ? 'Autonomous' : 'Manual Mode'}
+                        </div>
+                        <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-widest">Heartbeat: {useStore.getState().engineConfig.speedMultiplier}x Intelligence</p>
                     </div>
-                    <p className="text-[10px] text-gray-400 mt-2 uppercase font-bold tracking-widest">Heartbeat: {useStore.getState().engineConfig.speedMultiplier}x Intelligence</p>
                 </div>
             </div>
 

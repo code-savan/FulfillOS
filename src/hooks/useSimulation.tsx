@@ -22,22 +22,23 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
   
   const processWorkflow = () => {
     const state = useStore.getState();
-    const { engineConfig } = state;
+    const { engineConfig, currentWarehouseId } = state;
     const now = new Date();
     
-    // 1. Ingestion Engine
+    // 1. Ingestion Engine (Filtered to Active Warehouse)
     const integrationBoost = engineConfig.activeIntegrations.length * 0.1;
     if (Math.random() < (engineConfig.orderRate + integrationBoost)) {
       const newOrder = generateOrder('pending');
+      newOrder.warehouseId = currentWarehouseId; 
       state.addOrder(newOrder);
-      state.addLog('order', `New order ${newOrder.id} ingested by Engine`, `Autonomous routing initiated`);
+      state.addLog('order', `Order ${newOrder.id} ingested @ ${currentWarehouseId}`, `Autonomous routing initiated`);
     }
 
-    // 2. Assignment Engine (Prevention of Human Mistake)
-    const pendingOrders = state.orders.filter(o => o.status === 'pending' && !o.assignedTo)
+    // 2. Assignment Engine
+    const pendingOrders = state.orders.filter(o => o.status === 'pending' && !o.assignedTo && o.warehouseId === currentWarehouseId)
       .sort((a, b) => (b.isVIP ? 1 : 0) - (a.isVIP ? 1 : 0));
     
-    const availablePickers = state.staff.filter(s => s.role === 'picker' && s.status === 'idle');
+    const availablePickers = state.staff.filter(s => s.role === 'picker' && s.status === 'idle' && s.warehouseId === currentWarehouseId);
     
     pendingOrders.slice(0, availablePickers.length).forEach((order, index) => {
       const picker = availablePickers[index];
@@ -46,41 +47,46 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
         state.updateStaffStatus(picker.id, 'active');
         state.updateOrderStatus(order.id, 'picking');
         
-        // Set Durations
+        const distinctAisles = new Set(order.items.map(i => {
+            const inv = state.items.find(item => item.sku === i.sku);
+            return inv?.location.aisle;
+        }));
+        const batchEfficiency = distinctAisles.size === 1 ? 0.8 : 1.0;
+
         useStore.setState((s) => ({
             orders: s.orders.map(o => o.id === order.id ? {
                 ...o,
                 assignedAt: now,
                 stepStartTime: now,
-                estDurationMinutes: 0.5 // 30 seconds
+                estDurationMinutes: (0.5 * batchEfficiency)
             } : o)
         }));
 
-        state.addLog('staff', `Engine autonomously assigned ${picker.name} to order ${order.id}`);
+        state.addLog('staff', `Engine Batching: ${picker.name} assigned to ${order.id}. ${batchEfficiency < 1 ? 'Route Optimized' : 'Standard Pick'}`);
       }
     });
 
     // 3. Picking Engine
-    const pickingOrders = state.orders.filter(o => o.status === 'picking' && o.assignedTo);
+    const pickingOrders = state.orders.filter(o => o.status === 'picking' && o.assignedTo && o.warehouseId === currentWarehouseId);
     pickingOrders.forEach(order => {
-      // Check for human mistakes / anomalies
-      if (engineConfig.exceptionsEnabled && Math.random() > 0.99) {
+      if (engineConfig.exceptionsEnabled && Math.random() > 0.995) {
         const picker = state.staff.find(s => s.id === order.assignedTo);
         if (picker) {
           state.completeTask(picker.id);
           state.updateOrderStatus(order.id, 'exception');
-          state.addLog('system', `Engine detected anomaly on order ${order.id}`, `Manual review required`);
+          state.addLog('system', `Anomaly @ ${order.id}: Stock Discrepancy`, `Engine paused automated flow`);
         }
         return;
       }
       
-      // Automatic state transition based on estimated time
       const timeElapsed = (now.getTime() - new Date(order.stepStartTime!).getTime()) / 1000;
-      const adjustedDuration = STEP_DURATIONS_SEC.picking / engineConfig.speedMultiplier;
+      const adjustedDuration = (STEP_DURATIONS_SEC.picking * (order.estDurationMinutes! / 0.5)) / engineConfig.speedMultiplier;
 
       if (timeElapsed >= adjustedDuration) {
         const picker = state.staff.find(s => s.id === order.assignedTo);
         if (picker) {
+          const staffCost = (adjustedDuration / 3600) * picker.hourlyRate;
+          
           state.completeTask(picker.id);
           state.updateOrderStatus(order.id, 'packing');
           
@@ -89,11 +95,12 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
                   ...o,
                   assignedTo: undefined,
                   stepStartTime: now,
-                  estDurationMinutes: 0.33 // 20 seconds
+                  estDurationMinutes: 0.33,
+                  laborCost: (o.laborCost || 0) + staffCost
               } : o)
           }));
           
-          state.addLog('order', `Engine: Picking completed for ${order.id}. Moving to Packing.`);
+          state.addLog('order', `Engine: Picking complete for ${order.id}. Labor Incurred: $${staffCost.toFixed(2)}`);
           
           order.items.forEach(item => {
             state.updateStock(item.sku, -item.quantity);
@@ -103,10 +110,10 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
     });
 
     // 4. Packing Engine
-    const packingOrders = state.orders.filter(o => o.status === 'packing' && !o.assignedTo)
+    const packingOrders = state.orders.filter(o => o.status === 'packing' && !o.assignedTo && o.warehouseId === currentWarehouseId)
       .sort((a, b) => (b.isVIP ? 1 : 0) - (a.isVIP ? 1 : 0));
     
-    const availablePackers = state.staff.filter(s => s.role === 'packer' && s.status === 'idle');
+    const availablePackers = state.staff.filter(s => s.role === 'packer' && s.status === 'idle' && s.warehouseId === currentWarehouseId);
     
     packingOrders.slice(0, availablePackers.length).forEach((order, index) => {
       const packer = availablePackers[index];
@@ -124,7 +131,7 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
     });
 
     // 5. Shipping Engine
-    const activePackingOrders = state.orders.filter(o => o.status === 'packing' && o.assignedTo);
+    const activePackingOrders = state.orders.filter(o => o.status === 'packing' && o.assignedTo && o.warehouseId === currentWarehouseId);
     activePackingOrders.forEach(order => {
       const timeElapsed = (now.getTime() - new Date(order.stepStartTime!).getTime()) / 1000;
       const adjustedDuration = STEP_DURATIONS_SEC.packing / engineConfig.speedMultiplier;
@@ -132,12 +139,32 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
       if (timeElapsed >= adjustedDuration) {
         const packer = state.staff.find(s => s.id === order.assignedTo);
         if (packer) {
+          const staffCost = (adjustedDuration / 3600) * packer.hourlyRate;
+          
           state.completeTask(packer.id);
           state.updateOrderStatus(order.id, 'shipped');
-          state.addLog('order', `Engine autonomously marked order ${order.id} as shipped`);
+          
+          useStore.setState((s) => ({
+              orders: s.orders.map(o => o.id === order.id ? {
+                  ...o,
+                  laborCost: (o.laborCost || 0) + staffCost
+              } : o)
+          }));
+          
+          state.addLog('integration', `Engine marked order ${order.id} as SHIPPED. Total Labor: $${(order.laborCost || 0 + staffCost).toFixed(2)}`);
         }
       }
     });
+
+    // 6. Predictive Inventory Runway Update
+    if (Math.random() > 0.95) {
+        useStore.setState((s) => ({
+            items: s.items.map(item => ({
+                ...item,
+                runwayDays: Math.max(1, Math.floor(item.stock / (engineConfig.orderRate * 5 + 1)))
+            }))
+        }));
+    }
   };
 
   const currentSpeedRef = useRef(1000); // 1s Engine Tick

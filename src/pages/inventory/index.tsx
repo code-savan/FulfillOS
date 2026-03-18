@@ -11,7 +11,7 @@ export default function InventoryPage() {
   const [searchQuery, setSearchQuery] = useState('');
   const [categoryFilter, setCategoryFilter] = useState('All');
   const [showLowStockOnly, setShowLowStockOnly] = useState(false);
-  const { items, updateStock, addLog, addInventorySku } = useStore();
+  const { items, addLog, addInventorySku, currentWarehouseId } = useStore();
   const [isAddingItem, setIsAddingItem] = useState(false);
   const [newItem, setNewItem] = useState({ sku: '', name: '', category: 'Electronics', stock: 0, minStock: 5, aisle: 'A', bin: '01' });
 
@@ -21,10 +21,11 @@ export default function InventoryPage() {
     
     addInventorySku({
       ...newItem,
+      warehouseId: currentWarehouseId, // Assign to current node
       location: { aisle: newItem.aisle, bin: newItem.bin },
       lastUpdated: new Date()
     });
-    addLog('inventory', `New SKU ${newItem.sku} added to system`);
+    addLog('inventory', `New SKU ${newItem.sku} specified for ${currentWarehouseId}`);
     setIsAddingItem(false);
     setNewItem({ sku: '', name: '', category: 'Electronics', stock: 0, minStock: 5, aisle: 'A', bin: '01' });
   };
@@ -38,10 +39,7 @@ export default function InventoryPage() {
     return matchesSearch && matchesCategory && matchesLowStock;
   });
 
-  const handleStockUpdate = (sku: string, delta: number) => {
-    updateStock(sku, delta);
-    addLog('inventory', `Stock updated for ${sku}`, `${delta > 0 ? '+' : ''}${delta} units`);
-  };
+
 
   const lowStockCount = items.filter(i => i.stock <= i.minStock).length;
 
@@ -165,16 +163,16 @@ export default function InventoryPage() {
             </div>
 
             {/* Inventory Table */}
-            <div className="border border-black">
-              <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-black bg-gray-50 text-xs font-medium uppercase tracking-wider">
-                <div className="col-span-2">SKU</div>
-                <div className="col-span-3">Product Name</div>
+            <div className="border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
+              <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-black bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                <div className="col-span-1">Node</div>
+                <div className="col-span-2">SKU ID</div>
+                <div className="col-span-3">Product Specification</div>
                 <div className="col-span-2">Category</div>
-                <div className="col-span-2">Stock Level</div>
+                <div className="col-span-2">Stock / Runway</div>
                 <div className="col-span-2">Location</div>
-                <div className="col-span-1">Actions</div>
               </div>
-              <div className="divide-y divide-black">
+              <div className="divide-y divide-black bg-white">
                 {filteredItems.length === 0 ? (
                   <div className="px-4 py-12 text-center text-gray-500 text-sm">
                     No items found matching your criteria.
@@ -185,53 +183,41 @@ export default function InventoryPage() {
                     return (
                       <div
                         key={item.sku}
-                        className={`grid grid-cols-12 gap-4 px-4 py-4 items-center ${isLowStock ? 'bg-gray-50' : ''}`}
+                        className={`grid grid-cols-12 gap-4 px-4 py-4 items-center ${isLowStock ? 'bg-red-50/30' : ''}`}
                       >
-                        <div className="col-span-2 font-mono text-sm">{item.sku}</div>
+                        <div className="col-span-1">
+                            <span className="text-[10px] font-black bg-black text-white px-1.5 py-0.5 rounded">{item.warehouseId}</span>
+                        </div>
+                        <div className="col-span-2 font-mono text-sm font-bold tracking-tighter">{item.sku}</div>
                         <div className="col-span-3">
                           <div className="flex items-center gap-2">
                             <Package className="w-4 h-4 text-gray-400" />
-                            <span className="text-sm font-medium">{item.name}</span>
+                            <span className="text-sm font-black uppercase tracking-tighter">{item.name}</span>
                           </div>
                         </div>
-                        <div className="col-span-2 text-sm text-gray-600">{item.category}</div>
+                        <div className="col-span-2 text-[10px] font-bold uppercase tracking-widest text-gray-400">{item.category}</div>
                         <div className="col-span-2">
                           <div className="flex items-center gap-2">
-                            <span className={`font-mono text-sm ${isLowStock ? 'text-black font-bold' : ''}`}>
+                            <span className={`font-mono text-lg ${isLowStock ? 'text-red-600 font-black underline decoration-2' : 'font-black'}`}>
                               {item.stock}
                             </span>
-                            {isLowStock && (
-                              <AlertTriangle className="w-4 h-4" />
-                            )}
+                            {isLowStock && <AlertTriangle className="w-3 h-3 text-red-600" />}
                           </div>
-                          <div className="text-xs text-gray-400">Min: {item.minStock}</div>
+                          <div className="text-[10px] font-black uppercase text-gray-400 mt-1">
+                            Runway: <span className={item.runwayDays && item.runwayDays < 5 ? 'text-red-500' : ''}>{item.runwayDays || '?'} Days</span>
+                          </div>
                         </div>
                         <div className="col-span-2">
                           <div className="flex items-center gap-2 text-sm">
                             <MapPin className="w-4 h-4 text-gray-400" />
-                            <span className="font-mono">{item.location.aisle}-{item.location.bin}</span>
-                          </div>
-                        </div>
-                        <div className="col-span-1">
-                          <div className="flex items-center gap-1">
-                            <button
-                              onClick={() => handleStockUpdate(item.sku, -1)}
-                              className="w-7 h-7 flex items-center justify-center border border-black hover:bg-black hover:text-white transition-colors text-sm"
-                            >
-                              -
-                            </button>
-                            <button
-                              onClick={() => handleStockUpdate(item.sku, 1)}
-                              className="w-7 h-7 flex items-center justify-center border border-black hover:bg-black hover:text-white transition-colors text-sm"
-                            >
-                              +
-                            </button>
+                            <span className="font-mono font-bold tracking-widest text-xs bg-gray-100 px-2 py-1 border border-black/5">{item.location.aisle}-{item.location.bin}</span>
                           </div>
                         </div>
                       </div>
                     );
                   })
-                )}
+                )
+              }
               </div>
             </div>
 

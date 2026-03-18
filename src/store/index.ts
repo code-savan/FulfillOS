@@ -15,6 +15,7 @@ interface OrderState {
   updateOrderStatus: (orderId: string, status: OrderStatus) => void;
   assignOrder: (orderId: string, staffId: string) => void;
   markOrderVIP: (orderId: string) => void;
+  updateOrderLaborCost: (orderId: string, cost: number) => void; // New
   getOrdersByStatus: (status: OrderStatus) => Order[];
   getRecentOrders: (count: number) => Order[];
 }
@@ -48,6 +49,8 @@ interface EngineState {
   engineConfig: EngineConfig;
   updateEngineConfig: (config: Partial<EngineConfig>) => void;
   toggleIntegration: (id: string) => void;
+  currentWarehouseId: string; // New: Selected warehouse for view/engine context
+  setCurrentWarehouse: (id: string) => void; // New
 }
 
 interface AppState extends AuthState, OrderState, InventoryState, StaffState, LogState, EngineState {}
@@ -100,6 +103,13 @@ export const useStore = create<AppState>()(
         set((state) => ({
           orders: state.orders.map((o) =>
             o.id === orderId ? { ...o, isVIP: true } : o
+          )
+        }));
+      },
+      updateOrderLaborCost: (orderId, cost) => {
+        set((state) => ({
+          orders: state.orders.map((o) =>
+            o.id === orderId ? { ...o, laborCost: cost } : o
           )
         }));
       },
@@ -211,13 +221,20 @@ export const useStore = create<AppState>()(
             }
           };
         });
+      },
+      currentWarehouseId: 'WH-01',
+      setCurrentWarehouse: (id) => {
+        set({ currentWarehouseId: id });
+        get().addLog('system', `Warehouse Context Switched`, `Now viewing ${id} operations`);
       }
     }),
     {
       name: 'fulfillos-storage',
       partialize: (state) => ({ 
         isAuthenticated: state.isAuthenticated, 
-        user: state.user 
+        user: state.user,
+        currentWarehouseId: state.currentWarehouseId,
+        engineConfig: state.engineConfig
       })
     }
   )

@@ -83,6 +83,7 @@ export function generateOrder(status: OrderStatus = 'pending'): Order {
   const customer = generateCustomerName();
   const items = generateOrderItems();
   const total = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const warehouseId = Math.random() > 0.5 ? 'WH-01' : 'WH-02';
 
   return {
     id: generateId('ORD'),
@@ -92,7 +93,8 @@ export function generateOrder(status: OrderStatus = 'pending'): Order {
     status,
     total,
     createdAt: new Date(Date.now() - Math.floor(Math.random() * 86400000)),
-    shippingAddress: generateShippingAddress()
+    shippingAddress: generateShippingAddress(),
+    warehouseId
   };
 }
 
@@ -103,6 +105,7 @@ export function generateInventoryItems(): InventoryItem[] {
   PRODUCT_NAMES.forEach((product, index) => {
     const aisle = aisles[Math.floor(index / 3)];
     const bin = String(Math.floor((index % 3) * 10) + Math.floor(Math.random() * 10)).padStart(2, '0');
+    const warehouseId = index % 2 === 0 ? 'WH-01' : 'WH-02';
     
     items.push({
       sku: `SKU-${product.name.substring(0, 3).toUpperCase()}-${Math.floor(Math.random() * 900) + 100}`,
@@ -111,7 +114,9 @@ export function generateInventoryItems(): InventoryItem[] {
       stock: Math.floor(Math.random() * 200) + 10,
       minStock: 15,
       location: { aisle, bin },
-      lastUpdated: new Date()
+      lastUpdated: new Date(),
+      warehouseId,
+      runwayDays: Math.floor(Math.random() * 30) + 5
     });
   });
 
@@ -125,6 +130,8 @@ export function generateStaff(): Staff[] {
     const role = i < 4 ? 'picker' : i < 7 ? 'packer' : 'supervisor';
     const first = FIRST_NAMES[Math.floor(Math.random() * FIRST_NAMES.length)];
     const last = LAST_NAMES[Math.floor(Math.random() * LAST_NAMES.length)];
+    const warehouseId = i % 2 === 0 ? 'WH-01' : 'WH-02';
+    const hourlyRate = role === 'picker' ? 18 : role === 'packer' ? 16 : 25;
     
     staff.push({
       id: generateId('STF'),
@@ -132,7 +139,9 @@ export function generateStaff(): Staff[] {
       role,
       status: Math.random() > 0.3 ? 'idle' : 'active',
       ordersCompleted: Math.floor(Math.random() * 150) + 20,
-      efficiency: Math.floor(Math.random() * 30) + 70
+      efficiency: Math.floor(Math.random() * 30) + 70,
+      hourlyRate,
+      warehouseId
     });
   }
 

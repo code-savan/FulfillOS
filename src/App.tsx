@@ -12,6 +12,7 @@ import AnalyticsPage from '@/pages/analytics';
 import LogsPage from '@/pages/logs';
 import SettingsPage from '@/pages/settings';
 import DocsPage from '@/pages/docs';
+import PickerPage from '@/pages/picker';
 import { EngineProvider } from '@/hooks/useSimulation';
 
 export type PageRoute = 'landing' | 'auth' | 'dashboard' | 'orders' | 'inventory' | 'staff' | 'analytics' | 'logs' | 'settings' | 'docs';
@@ -62,6 +63,7 @@ function App() {
             <Route path="/logs/*" element={<ProtectedRoute><LogsPage /></ProtectedRoute>} />
             <Route path="/settings/*" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/docs/*" element={<ProtectedRoute><DocsPage /></ProtectedRoute>} />
+            <Route path="/picker" element={<ProtectedRoute><PickerPage /></ProtectedRoute>} />
             <Route path="*" element={<Navigate to="/" replace />} />
           </Routes>
         </BrowserRouter>

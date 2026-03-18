@@ -40,7 +40,8 @@ export default function StaffPage() {
     idle: staff.filter(s => s.status === 'idle').length,
     offline: staff.filter(s => s.status === 'offline').length,
     totalCompleted: staff.reduce((sum, s) => sum + s.ordersCompleted, 0),
-    avgEfficiency: Math.round(staff.reduce((sum, s) => sum + s.efficiency, 0) / staff.length || 0)
+    avgEfficiency: Math.round(staff.reduce((sum, s) => sum + s.efficiency, 0) / staff.length || 0),
+    burnRate: staff.filter(s => s.status !== 'offline').reduce((sum, s) => sum + s.hourlyRate, 0)
   };
 
   return (
@@ -74,30 +75,26 @@ export default function StaffPage() {
             </div>
 
             {/* Stats Overview */}
-            <div className="grid grid-cols-6 gap-0 border border-black mb-6">
-              <div className="p-4 border-r border-black">
-                <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Staff</div>
-                <div className="text-2xl font-bold">{stats.total}</div>
+            <div className="grid grid-cols-5 gap-0 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] mb-6">
+              <div className="p-4 border-r-4 border-black">
+                <div className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">Total Staff</div>
+                <div className="text-3xl font-black">{stats.total}</div>
               </div>
-              <div className="p-4 border-r border-black">
-                <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Active</div>
-                <div className="text-2xl font-bold">{stats.active}</div>
+              <div className="p-4 border-r-4 border-black">
+                <div className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest text-green-600">Active Hand</div>
+                <div className="text-3xl font-black">{stats.active}</div>
               </div>
-              <div className="p-4 border-r border-black">
-                <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Idle</div>
-                <div className="text-2xl font-bold">{stats.idle}</div>
+              <div className="p-4 border-r-4 border-black bg-gray-50">
+                <div className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest text-red-500">Hourly Burn</div>
+                <div className="text-3xl font-black font-mono">${stats.burnRate}/hr</div>
               </div>
-              <div className="p-4 border-r border-black">
-                <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Offline</div>
-                <div className="text-2xl font-bold">{stats.offline}</div>
+              <div className="p-4 border-r-4 border-black">
+                <div className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest">Global Output</div>
+                <div className="text-3xl font-black font-mono">{stats.totalCompleted}</div>
               </div>
-              <div className="p-4 border-r border-black">
-                <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Orders Done</div>
-                <div className="text-2xl font-bold font-mono">{stats.totalCompleted}</div>
-              </div>
-              <div className="p-4">
-                <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Avg Efficiency</div>
-                <div className="text-2xl font-bold">{stats.avgEfficiency}%</div>
+              <div className="p-4 bg-black text-white">
+                <div className="text-[10px] font-black uppercase text-gray-400 mb-1 tracking-widest text-gray-500">Efficiency Index</div>
+                <div className="text-3xl font-black">{stats.avgEfficiency}%</div>
               </div>
             </div>
 
@@ -184,16 +181,16 @@ export default function StaffPage() {
                     </div>
 
                     {/* Stats */}
-                    <div className="grid grid-cols-2 gap-4 mb-4">
+                    <div className="grid grid-cols-2 gap-4 mb-4 border border-black/10 p-3 bg-gray-50/50">
                       <div>
-                        <div className="text-xs text-gray-500">Orders Completed</div>
-                        <div className="font-mono font-medium">{member.ordersCompleted}</div>
+                        <div className="text-[10px] font-black uppercase text-gray-400">Node / Rate</div>
+                        <div className="font-mono font-bold text-xs">{member.warehouseId} • ${member.hourlyRate}/h</div>
                       </div>
                       <div>
-                        <div className="text-xs text-gray-500">Efficiency</div>
+                        <div className="text-[10px] font-black uppercase text-gray-400">Efficiency</div>
                         <div className="flex items-center gap-1">
-                          <TrendingUp className="w-3 h-3" />
-                          <span className="font-mono font-medium">{member.efficiency}%</span>
+                          <TrendingUp className="w-3 h-3 text-green-600" />
+                          <span className="font-mono font-bold text-xs">{member.efficiency}%</span>
                         </div>
                       </div>
                     </div>

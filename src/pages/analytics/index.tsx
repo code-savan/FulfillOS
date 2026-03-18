@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useMemo } from 'react';
 import {
   LineChart,
@@ -12,15 +11,19 @@ import {
   ResponsiveContainer,
   Cell
 } from 'recharts';
-import { TrendingUp, Package, Users, Clock } from 'lucide-react';
+import { Package, Clock, TrendingUp } from 'lucide-react';
 import { useStore } from '@/store';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
 
 
 export default function AnalyticsPage() {
-  const navigate = useNavigate();
-  const { orders, staff } = useStore();
+  const { 
+    orders, 
+    staff, 
+    currentWarehouseId, 
+    setCurrentWarehouse 
+  } = useStore();
 
   // Generate orders over time data
   const ordersOverTime = useMemo(() => {
@@ -58,10 +61,10 @@ export default function AnalyticsPage() {
   }, [staff]);
 
   // Calculate metrics
-  const totalOrders = orders.length;
-  const shippedOrders = orders.filter(o => o.status === 'shipped').length;
-  const avgFulfillmentTime = 42; // minutes
-  const staffUtilization = Math.round((staff.filter(s => s.status === 'active').length / staff.length) * 100);
+  const filteredOrders = orders.filter(o => o.warehouseId === currentWarehouseId);
+  const totalLaborCost = filteredOrders.reduce((sum, o) => sum + (o.laborCost || 0), 0);
+  const totalRevenue = filteredOrders.reduce((sum, o) => sum + o.total, 0);
+  const avgFulfillmentTime = 38; // minutes
 
   return (
     <div className="min-h-screen bg-white flex">
@@ -70,50 +73,102 @@ export default function AnalyticsPage() {
       <div className="flex-1 flex flex-col min-h-screen">
         <Topbar />
         
-        <main className="flex-1 p-6 overflow-auto">
+        <main className="flex-1 p-6 overflow-auto bg-gray-50 border-l border-black">
           <div className="max-w-7xl mx-auto space-y-6">
-            {/* Page Header */}
-            <div>
-              <h1 className="text-2xl font-bold">Analytics</h1>
-              <p className="text-sm text-gray-500 mt-1">Operational performance metrics</p>
+            
+            {/* Quick Context / Helper */}
+            <div className="bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-start justify-between gap-8">
+                <div className="space-y-4">
+                    <h2 className="text-4xl font-black uppercase tracking-tighter leading-none">
+                        Operational <br/><span className="text-gray-400 uppercase">Growth Intelligence</span>
+                    </h2>
+                    <p className="max-w-xl text-sm font-medium leading-relaxed italic text-gray-500">
+                        "Your fulfillment engine doesn't just move boxes; it generates data. Use these 'Growth Levers' to identify bottlenecks. The Labor Cost metric shows exactly where your human capital is being spent vs. the value it creates."
+                    </p>
+                </div>
+                
+                <div className="flex gap-4">
+                    <button 
+                        onClick={() => setCurrentWarehouse('WH-01')}
+                        className={`px-6 py-3 border-2 border-black font-black uppercase text-xs transition-all ${currentWarehouseId === 'WH-01' ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' : 'bg-white text-black hover:bg-gray-50'}`}
+                    >
+                        WH-01: North Node
+                    </button>
+                    <button 
+                        onClick={() => setCurrentWarehouse('WH-02')}
+                        className={`px-6 py-3 border-2 border-black font-black uppercase text-xs transition-all ${currentWarehouseId === 'WH-02' ? 'bg-black text-white shadow-[4px_4px_0px_0px_rgba(0,0,0,0.3)]' : 'bg-white text-black hover:bg-gray-50'}`}
+                    >
+                        WH-02: West Node
+                    </button>
+                </div>
             </div>
 
             {/* Key Metrics */}
-            <div className="grid grid-cols-4 gap-0 border border-black">
-              <div className="p-6 border-r border-black">
+            <div className="grid grid-cols-4 gap-0 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+              <div className="p-6 border-r-4 border-black">
                 <div className="flex items-center gap-2 mb-2">
-                  <Package className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs text-gray-500 uppercase tracking-wider">Total Orders</span>
+                  <Package className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs font-black uppercase tracking-widest text-gray-400">Node Influx</span>
                 </div>
-                <div className="text-3xl font-bold font-mono">{totalOrders}</div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {shippedOrders} shipped ({Math.round((shippedOrders / totalOrders) * 100) || 0}%)
+                <div className="text-4xl font-black font-mono tracking-tighter">{filteredOrders.length}</div>
+                <div className="text-[10px] font-black uppercase text-gray-400 mt-1">
+                  Active in {currentWarehouseId}
                 </div>
               </div>
-              <div className="p-6 border-r border-black">
+              <div className="p-6 border-r-4 border-black bg-gray-50">
                 <div className="flex items-center gap-2 mb-2">
-                  <Clock className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs text-gray-500 uppercase tracking-wider">Avg Fulfillment</span>
+                  <Clock className="w-4 h-4 text-gray-400" />
+                  <span className="text-xs font-black uppercase tracking-widest text-gray-400">Avg Lead Time</span>
                 </div>
-                <div className="text-3xl font-bold font-mono">{avgFulfillmentTime}m</div>
-                <div className="text-xs text-gray-500 mt-1">End-to-end</div>
+                <div className="text-4xl font-black font-mono tracking-tighter">{avgFulfillmentTime}<span className="text-lg">m</span></div>
+                <div className="text-[10px] font-black uppercase text-gray-400 mt-1">Pik+Pak Combined</div>
               </div>
-              <div className="p-6 border-r border-black">
-                <div className="flex items-center gap-2 mb-2">
-                  <Users className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs text-gray-500 uppercase tracking-wider">Staff Utilization</span>
+              <div className="p-6 border-r-4 border-black">
+                <div className="flex items-center gap-2 mb-2 text-red-500">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-xs font-black uppercase tracking-widest">Labor Burn</span>
                 </div>
-                <div className="text-3xl font-bold font-mono">{staffUtilization}%</div>
-                <div className="text-xs text-gray-500 mt-1">Currently active</div>
+                <div className="text-4xl font-black font-mono tracking-tighter text-red-600">${totalLaborCost.toFixed(2)}</div>
+                <div className="text-[10px] font-black uppercase text-gray-400 mt-1">Accrued Operational Cost</div>
               </div>
-              <div className="p-6">
-                <div className="flex items-center gap-2 mb-2">
-                  <TrendingUp className="w-4 h-4 text-gray-500" />
-                  <span className="text-xs text-gray-500 uppercase tracking-wider">Throughput</span>
+              <div className="p-6 bg-green-50">
+                <div className="flex items-center gap-2 mb-2 text-green-600">
+                  <TrendingUp className="w-4 h-4" />
+                  <span className="text-xs font-black uppercase tracking-widest">Gross Margin</span>
                 </div>
-                <div className="text-3xl font-bold font-mono">{Math.round(shippedOrders / 7)}/day</div>
-                <div className="text-xs text-gray-500 mt-1">7-day average</div>
+                <div className="text-4xl font-black font-mono tracking-tighter text-green-700">
+                    {totalRevenue > 0 ? (Math.max(0, (totalRevenue - totalLaborCost) / totalRevenue * 100)).toFixed(1) : '0'}%
+                </div>
+                <div className="text-[10px] font-black uppercase text-green-600/50 mt-1">Efficiency adjusted</div>
               </div>
+            </div>
+
+            {/* Geo-Intelligence Node Map Mockup */}
+            <div className="border-4 border-black p-8 bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between gap-12">
+                <div className="space-y-4 max-w-sm">
+                    <h3 className="text-2xl font-black uppercase tracking-tighter">Geo-Intelligence <span className="text-gray-400">Map</span></h3>
+                    <p className="text-sm text-gray-500 leading-relaxed italic">
+                        "Your engine is multi-node. Our routing logic automatically directs shipments to the node closest to the customer to minimize transit burn."
+                    </p>
+                    <div className="flex items-center gap-4 text-xs font-black uppercase tracking-widest text-gray-400">
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-black rounded-sm"></div> WH-01 (Active)</div>
+                        <div className="flex items-center gap-1.5"><div className="w-3 h-3 bg-gray-200 rounded-sm"></div> WH-02 (Standby)</div>
+                    </div>
+                </div>
+                <div className="flex-1 h-48 bg-gray-100 border-2 border-black relative overflow-hidden flex items-center justify-center">
+                    {/* Mock map graphic */}
+                    <div className="absolute inset-0 opacity-10" style={{ backgroundImage: 'radial-gradient(circle, #000 1px, transparent 1px)', backgroundSize: '15px 15px' }}></div>
+                    <div className="relative w-full h-full flex items-center justify-center">
+                        <svg viewBox="0 0 400 200" className="w-full h-full">
+                            <path d="M50,150 Q100,50 150,150 T250,150" fill="none" stroke="#ddd" strokeWidth="2" strokeDasharray="4" />
+                            <circle cx="80" cy="100" r="6" fill={currentWarehouseId === 'WH-01' ? 'black' : '#ccc'} />
+                            <text x="70" y="85" fontSize="10" fontWeight="900" textAnchor="middle">WH-01 (NORTH)</text>
+                            
+                            <circle cx="320" cy="120" r="6" fill={currentWarehouseId === 'WH-02' ? 'black' : '#ccc'} />
+                            <text x="330" y="105" fontSize="10" fontWeight="900" textAnchor="middle">WH-02 (WEST)</text>
+                        </svg>
+                    </div>
+                </div>
             </div>
 
             {/* Charts Grid */}
@@ -271,7 +326,7 @@ export default function AnalyticsPage() {
                   { status: 'Packing', count: orders.filter(o => o.status === 'packing').length, color: 'bg-gray-600' },
                   { status: 'Shipped', count: orders.filter(o => o.status === 'shipped').length, color: 'bg-gray-400' },
                 ].map(({ status, count, color }) => {
-                  const percentage = totalOrders > 0 ? (count / totalOrders) * 100 : 0;
+                  const percentage = filteredOrders.length > 0 ? (count / filteredOrders.length) * 100 : 0;
                   return (
                     <div key={status} className="text-center">
                       <div className="text-3xl font-bold font-mono mb-1">{count}</div>

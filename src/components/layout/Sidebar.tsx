@@ -7,7 +7,8 @@ import {
   FileText,
   Box,
   Settings,
-  BookOpen
+  BookOpen,
+  Smartphone
 } from 'lucide-react';
 import { Link, useLocation } from 'react-router-dom';
 
@@ -19,6 +20,7 @@ const navItems = [
   { id: '/analytics', label: 'Intelligence', icon: BarChart3, desc: 'Growth Metrics' },
   { id: '/logs', label: 'Audit Trail', icon: FileText, desc: 'System Events' },
   { id: '/settings', label: 'Engine Controls', icon: Settings, desc: 'System Rules' },
+  { id: '/picker', label: 'Picker Mode', icon: Smartphone, desc: 'Handheld Floor View' },
   { id: '/docs', label: 'Documentation', icon: BookOpen, desc: 'User Manual' },
 ];
 
