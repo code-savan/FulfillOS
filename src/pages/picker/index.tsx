@@ -1,9 +1,11 @@
 import { useState } from 'react';
 import { useStore } from '@/store';
-import { MapPin, CheckCircle, Smartphone, User, History, Boxes } from 'lucide-react';
+import { MapPin, CheckCircle, Smartphone, User, History, Boxes, ArrowLeft } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 export default function PickerPage() {
+  const navigate = useNavigate();
   const { orders, staff, currentWarehouseId } = useStore();
   
   // Mock current logged in staff for this mobile view
@@ -31,9 +33,17 @@ export default function PickerPage() {
         <p className="text-gray-500 text-sm max-w-xs leading-relaxed uppercase font-bold tracking-widest">
             The engine is currently routing new shipments. You will be alerted when a batch is ready.
         </p>
-        <div className="mt-12 flex items-center gap-2 text-[10px] font-black tracking-widest text-gray-700 uppercase">
-            <User className="w-3 h-3" />
-            Signed in as: {currentStaff.name} / {currentWarehouseId}
+        <div className="mt-12 space-y-4 flex flex-col items-center">
+            <button 
+                onClick={() => navigate('/dashboard')}
+                className="px-6 py-3 bg-white text-black text-xs font-black uppercase tracking-widest rounded-xl hover:bg-white/90 active:scale-95 transition-all"
+            >
+                Return to Command Center
+            </button>
+            <div className="flex items-center gap-2 text-[10px] font-black tracking-widest text-gray-700 uppercase">
+                <User className="w-3 h-3" />
+                Signed in as: {currentStaff.name} / {currentWarehouseId}
+            </div>
         </div>
       </div>
     );
@@ -45,8 +55,13 @@ export default function PickerPage() {
     <div className="min-h-screen bg-[#0A0A0A] text-white font-sans flex flex-col">
       {/* Handheld Header */}
       <header className="p-6 border-b border-white/10 flex items-center justify-between">
-            <div className="flex items-center gap-3">
-                <div className="w-8 h-8 bg-white text-black flex items-center justify-center rounded-lg font-black text-xs">P</div>
+            <div className="flex items-center gap-4">
+                <button 
+                  onClick={() => navigate('/dashboard')}
+                  className="w-10 h-10 flex items-center justify-center bg-white/5 border border-white/10 rounded-xl hover:bg-white hover:text-black transition-all"
+                >
+                  <ArrowLeft className="w-5 h-5" />
+                </button>
                 <div>
                     <h2 className="text-[10px] uppercase font-black tracking-widest text-gray-500 leading-none mb-1">Active Batch</h2>
                     <span className="font-mono text-sm">{activeOrder.id}</span>

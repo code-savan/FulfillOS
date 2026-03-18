@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Search, X, ChevronRight, User, MapPin, Package } from 'lucide-react';
+import { Search, X, User, MapPin, Package } from 'lucide-react';
 import { useStore } from '@/store';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
@@ -70,105 +70,169 @@ export default function OrdersPage() {
                 </div>
             </div>
 
-            {/* Filters */}
-            <div className="flex items-center gap-4 mb-6">
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
-                <input
-                  type="text"
-                  placeholder="Search orders..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  className="w-full pl-10 pr-4 py-2 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
-                />
-              </div>
-              <select
-                value={statusFilter}
-                onChange={(e) => setStatusFilter(e.target.value as OrderStatus | 'all')}
-                className="px-4 py-2 border border-black text-sm focus:outline-none focus:ring-2 focus:ring-black"
-              >
-                <option value="all">All Status</option>
-                <option value="pending">Pending</option>
-                <option value="picking">Picking</option>
-                <option value="packing">Packing</option>
-                <option value="shipped">Shipped</option>
-                <option value="exception">Exception</option>
-              </select>
-            </div>
-
-            {/* Orders Table */}
-            <div className="border border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
-              <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-black bg-gray-100 text-[10px] font-black uppercase tracking-widest">
-                <div className="col-span-2">Ref ID</div>
-                <div className="col-span-3">Entity / Customer</div>
-                <div className="col-span-4 text-center">Engine State Mode</div>
-                <div className="col-span-2 text-right">Valuation</div>
-                <div className="col-span-1"></div>
-              </div>
-              <div className="divide-y divide-black">
-                {filteredOrders.length === 0 ? (
-                  <div className="px-4 py-12 text-center text-gray-400 text-xs uppercase font-bold">
-                    No active processes in queue.
-                  </div>
-                ) : (
-                  filteredOrders.map((order) => {
-                    const handler = staff.find(s => s.id === order.assignedTo);
-                    const isProcessing = ['picking', 'packing'].includes(order.status);
-                    
-                    return (
-                      <div
-                        key={order.id}
-                        onClick={() => setSelectedOrder(order)}
-                        className={`grid grid-cols-12 gap-4 px-6 py-5 hover:bg-gray-50 cursor-pointer transition-all items-center border-l-4 ${order.status === 'exception' ? 'border-l-red-600' : order.isVIP ? 'border-l-yellow-400' : 'border-l-transparent'}`}
-                      >
-                        <div className="col-span-2 font-mono text-xs font-bold">{order.id}</div>
-                        <div className="col-span-3">
-                          <div className="text-sm font-bold flex items-center gap-2">
-                            {order.customer}
-                            {order.isVIP && <span className="px-1.5 py-0.5 bg-yellow-400 text-black text-[9px] font-black uppercase tracking-tighter rounded border border-black">VIP</span>}
-                          </div>
-                          <div className="text-[10px] text-gray-400 font-mono uppercase truncate">{order.email}</div>
+            {/* Two-Pane Layout */}
+            <div className="grid grid-cols-12 gap-6 items-start">
+                
+                {/* Left Pane: Master Order Ledger (Stable) */}
+                <div className="col-span-8 space-y-6">
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <h3 className="text-xl font-black uppercase tracking-tighter">Master Order Ledger</h3>
+                            <span className="px-2 py-0.5 bg-black text-white text-[10px] font-black uppercase tracking-widest">Stable View</span>
                         </div>
-                        <div className="col-span-4">
-                          <div className="flex flex-col gap-2">
-                            <div className="flex justify-between items-end text-[10px] uppercase font-bold">
-                              <span className={`${order.status === 'exception' ? 'text-red-600' : 'text-black'}`}>
-                                {order.status === 'exception' ? '!! SYSTEM ANOMALY !!' : order.status}
-                              </span>
-                              {handler && (
-                                <span className="text-gray-400">Handling BY: {handler.name}</span>
-                              )}
-                            </div>
-                            
-                            {/* Progress Indicator */}
-                            {isProcessing ? (
-                                <div className="w-full h-1.5 bg-gray-100 border border-black overflow-hidden relative">
-                                    <motion.div 
-                                        initial={{ width: '0%' }}
-                                        animate={{ width: '100%' }}
-                                        transition={{ 
-                                            duration: (order.estDurationMinutes || 0.5) * 60 / useStore.getState().engineConfig.speedMultiplier,
-                                            ease: 'linear'
-                                        } as any}
-                                        className="h-full bg-black"
-                                    />
+                        <div className="text-[10px] font-bold text-gray-400 uppercase italic">
+                            * Records here are pinned for easy selection. User manual sync required for new batches.
+                        </div>
+                    </div>
+
+                    {/* Filters Inside Ledger */}
+                    <div className="flex items-center gap-4 mb-4">
+                        <div className="relative flex-1 max-w-md">
+                            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" />
+                            <input
+                                type="text"
+                                placeholder="Locate entity by ID or Name..."
+                                value={searchQuery}
+                                onChange={(e) => setSearchQuery(e.target.value)}
+                                className="w-full pl-10 pr-4 py-2 border-2 border-black text-sm font-bold focus:outline-none bg-white"
+                            />
+                        </div>
+                        <select
+                            value={statusFilter}
+                            onChange={(e) => setStatusFilter(e.target.value as OrderStatus | 'all')}
+                            className="px-4 py-2 border-2 border-black text-xs font-black uppercase focus:outline-none bg-white shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                        >
+                            <option value="all">Total Archive</option>
+                            <option value="pending">Awaiting Engine</option>
+                            <option value="exception">System Anomalies</option>
+                            <option value="shipped">Fulfillment Archive</option>
+                        </select>
+                    </div>
+
+                    <div className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
+                        <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b-2 border-black bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                            <div className="col-span-3">Entity ID</div>
+                            <div className="col-span-5">Identity / Designation</div>
+                            <div className="col-span-2 text-right">Valuation</div>
+                            <div className="col-span-2 text-right">State</div>
+                        </div>
+                        <div className="divide-y-2 divide-black max-h-[600px] overflow-auto custom-scrollbar">
+                            {filteredOrders.length === 0 ? (
+                                <div className="px-4 py-12 text-center text-gray-400 text-xs uppercase font-black italic">
+                                    No records matching active filter.
                                 </div>
                             ) : (
-                                <div className={`w-full h-1.5 border border-black ${order.status === 'shipped' ? 'bg-black' : order.status === 'exception' ? 'bg-red-600' : 'bg-transparent'}`} />
+                                filteredOrders.map((order) => (
+                                    <div
+                                        key={order.id}
+                                        onClick={() => setSelectedOrder(order)}
+                                        className={`grid grid-cols-12 gap-4 px-6 py-4 hover:bg-black hover:text-white cursor-pointer transition-all items-center group ${order.status === 'exception' ? 'bg-red-50' : ''}`}
+                                    >
+                                        <div className="col-span-3 font-mono text-xs font-black">{order.id}</div>
+                                        <div className="col-span-5">
+                                            <div className="text-sm font-black uppercase tracking-tighter truncate group-hover:text-white">{order.customer}</div>
+                                            <div className="text-[10px] font-bold text-gray-400 uppercase truncate group-hover:text-gray-300">{order.email}</div>
+                                        </div>
+                                        <div className="col-span-2 text-right font-mono text-sm font-black">
+                                            ${order.total.toFixed(2)}
+                                        </div>
+                                        <div className="col-span-2 text-right">
+                                            <span className={`px-2 py-0.5 text-[9px] font-black uppercase border border-current ${order.status === 'exception' ? 'text-red-600 border-red-600' : 'text-gray-400 border-gray-400 group-hover:text-white group-hover:border-white'}`}>
+                                                {order.status}
+                                            </span>
+                                        </div>
+                                    </div>
+                                ))
                             )}
-                          </div>
                         </div>
-                        <div className="col-span-2 text-right font-mono text-sm font-bold">
-                          ${order.total.toFixed(2)}
+                    </div>
+                </div>
+
+                {/* Right Pane: Live Engine Flow (Moving) */}
+                <div className="col-span-4 space-y-6">
+                    <div className="flex items-center gap-2 mb-2">
+                        <h3 className="text-xl font-black uppercase tracking-tighter">Engine Live Flow</h3>
+                        <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
+                    </div>
+
+                    <div className="p-6 border-4 border-black bg-black text-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] space-y-4">
+                        <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
+                            Orders currently being processed by the autonomous robotic core and warehouse staff.
+                        </p>
+                        
+                        <div className="space-y-3 max-h-[640px] overflow-auto pr-2 custom-scrollbar">
+                            {orders.filter(o => ['picking', 'packing'].includes(o.status)).length === 0 ? (
+                                <div className="py-12 text-center border-2 border-dashed border-white/20 text-white/30 text-[10px] font-black uppercase italic">
+                                    Engine IDLE. Awaiting input.
+                                </div>
+                            ) : (
+                                orders
+                                    .filter(o => ['picking', 'packing'].includes(o.status))
+                                    .map((order) => {
+                                        const handler = staff.find(s => s.id === order.assignedTo);
+                                        return (
+                                            <motion.div
+                                                key={order.id}
+                                                layout
+                                                initial={{ opacity: 0, x: 20 }}
+                                                animate={{ opacity: 1, x: 0 }}
+                                                className="p-4 bg-white/5 border border-white/10 space-y-3 relative overflow-hidden group"
+                                            >
+                                                <div className="flex justify-between items-start">
+                                                    <div>
+                                                        <div className="text-[10px] font-black text-gray-500 uppercase">{order.id}</div>
+                                                        <div className="text-xs font-black uppercase tracking-tighter">{order.customer}</div>
+                                                    </div>
+                                                    <div className="px-2 py-0.5 bg-white text-black text-[9px] font-black uppercase">
+                                                        {order.status}
+                                                    </div>
+                                                </div>
+
+                                                <div className="space-y-1.5">
+                                                    <div className="flex justify-between text-[9px] font-bold text-gray-400 uppercase">
+                                                        <span>Processing State</span>
+                                                        <span>{handler?.name || 'Allocating...'}</span>
+                                                    </div>
+                                                    <div className="w-full h-1 bg-white/10 overflow-hidden relative">
+                                                        <motion.div 
+                                                            initial={{ width: '0%' }}
+                                                            animate={{ width: '100%' }}
+                                                            transition={{ 
+                                                                duration: (order.estDurationMinutes || 1) * 60 / useStore.getState().engineConfig.speedMultiplier,
+                                                                ease: 'linear'
+                                                            } as any}
+                                                            className="h-full bg-white shadow-[0_0_8px_white]"
+                                                        />
+                                                    </div>
+                                                </div>
+
+                                                <button 
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedOrder(order);
+                                                    }}
+                                                    className="w-full py-2 bg-white/10 hover:bg-white hover:text-black text-[10px] font-black uppercase tracking-widest transition-all opacity-0 group-hover:opacity-100"
+                                                >
+                                                    Interrupt State
+                                                </button>
+                                            </motion.div>
+                                        );
+                                    })
+                            )}
                         </div>
-                        <div className="col-span-1 flex justify-end">
-                          <ChevronRight className="w-4 h-4 text-black" />
+                    </div>
+
+                    {/* Quick Stats / Node Health */}
+                    <div className="p-5 border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                        <div className="text-[10px] font-black uppercase text-gray-400 mb-2">Node Efficiency</div>
+                        <div className="flex items-end gap-2">
+                            <span className="text-3xl font-black font-mono">
+                                {Math.round(staff.reduce((acc, s) => acc + s.efficiency, 0) / staff.length)}%
+                            </span>
+                            <span className="text-[10px] font-bold text-green-600 uppercase mb-1">+2.4% OPTIMIZED</span>
                         </div>
-                      </div>
-                    );
-                  })
-                )}
-              </div>
+                    </div>
+                </div>
             </div>
           </div>
         </main>

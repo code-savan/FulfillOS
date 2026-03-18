@@ -135,33 +135,33 @@ export default function DashboardPage() {
             {/* Main Content Grid */}
             <div className="grid grid-cols-3 gap-6">
               {/* Live Orders Feed */}
-              <div className="col-span-2 border border-black">
+              <div className="col-span-2 border border-black bg-white">
                 <div className="px-4 py-3 border-b border-black bg-gray-50 flex items-center justify-between">
-                  <h2 className="font-semibold text-sm">Live Orders Feed</h2>
+                  <h2 className="font-black text-[10px] uppercase tracking-widest text-gray-400 italic">Live Orders Feed</h2>
                   <button
                     onClick={() => navigate('/orders')}
-                    className="text-xs text-gray-500 hover:text-black transition-colors"
+                    className="text-[10px] font-black uppercase text-gray-400 hover:text-black transition-colors underline decoration-black/20"
                   >
                     View All →
                   </button>
                 </div>
-                <div className="divide-y divide-black">
+                <div className="divide-y divide-black max-h-[400px] overflow-auto custom-scrollbar">
                   {recentOrders.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-gray-500 text-sm">
-                      No orders yet. Start simulation to generate orders.
+                    <div className="px-4 py-8 text-center text-gray-400 text-xs uppercase font-black italic">
+                      No orders yet.
                     </div>
                   ) : (
                     recentOrders.map((order) => (
-                      <div key={order.id} className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors">
+                      <div key={order.id} className="px-4 py-3 flex items-center justify-between hover:bg-gray-50 transition-colors group">
                         <div className="flex items-center gap-4">
-                          <span className="font-mono text-sm">{order.id}</span>
-                          <span className="text-sm">{order.customer}</span>
+                          <span className="font-mono text-xs font-black">{order.id}</span>
+                          <span className="text-sm font-black uppercase tracking-tighter">{order.customer}</span>
                         </div>
                         <div className="flex items-center gap-4">
-                          <span className={`px-2 py-1 text-xs border ${statusColors[order.status]}`}>
-                            {order.status.charAt(0).toUpperCase() + order.status.slice(1)}
+                          <span className={`px-2 py-0.5 text-[10px] uppercase font-black border ${statusColors[order.status]}`}>
+                            {order.status}
                           </span>
-                          <span className="font-mono text-sm">${order.total.toFixed(2)}</span>
+                          <span className="font-mono text-sm font-black">${order.total.toFixed(2)}</span>
                         </div>
                       </div>
                     ))
@@ -170,29 +170,26 @@ export default function DashboardPage() {
               </div>
 
               {/* Activity Logs */}
-              <div className="border border-black">
+              <div className="border border-black bg-white">
                 <div className="px-4 py-3 border-b border-black bg-gray-50">
-                  <h2 className="font-semibold text-sm">Activity Logs</h2>
+                  <h2 className="font-black text-[10px] uppercase tracking-widest text-gray-400 italic">Activity Logs</h2>
                 </div>
-                <div className="max-h-80 overflow-auto">
+                <div className="max-h-[400px] overflow-auto custom-scrollbar">
                   {recentLogs.length === 0 ? (
-                    <div className="px-4 py-8 text-center text-gray-500 text-sm">
+                    <div className="px-4 py-8 text-center text-gray-400 text-xs uppercase font-black italic">
                       No activity yet.
                     </div>
                   ) : (
-                    <div className="divide-y divide-gray-200">
+                    <div className="divide-y divide-gray-100">
                       {recentLogs.map((log) => (
-                        <div key={log.id} className="px-4 py-3">
+                        <div key={log.id} className="px-4 py-3 hover:bg-gray-50 transition-all">
                           <div className="flex items-center gap-2 mb-1">
-                            <span className={`w-2 h-2 ${logTypeColors[log.type]}`} />
-                            <span className="text-xs text-gray-400">
+                            <span className={`w-1.5 h-1.5 rounded-full ${logTypeColors[log.type] || 'bg-gray-300'}`} />
+                            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tighter">
                               {new Date(log.timestamp).toLocaleTimeString()}
                             </span>
                           </div>
-                          <p className="text-sm">{log.message}</p>
-                          {log.details && (
-                            <p className="text-xs text-gray-500 mt-1">{log.details}</p>
-                          )}
+                          <p className="text-xs font-black uppercase tracking-tighter">{log.message}</p>
                         </div>
                       ))}
                     </div>
@@ -202,39 +199,34 @@ export default function DashboardPage() {
             </div>
 
             {/* Fulfillment Pipeline */}
-            <div className="border border-black">
+            <div className="border border-black bg-white">
               <div className="px-4 py-3 border-b border-black bg-gray-50 flex items-center justify-between">
-                <h2 className="font-semibold text-sm">Fulfillment Pipeline</h2>
+                <h2 className="font-black text-[10px] uppercase tracking-widest text-gray-400 italic">Fulfillment Pipeline</h2>
                 <div className="flex items-center gap-2">
-                  <span className="text-xs text-gray-500">Total Orders:</span>
-                  <span className="font-mono text-sm">{orders.length}</span>
+                  <span className="text-[9px] font-black text-gray-400 uppercase tracking-widest">Global Capacity:</span>
+                  <span className="font-mono text-xs font-black">{orders.length}</span>
                 </div>
               </div>
               <div className="grid grid-cols-4 divide-x divide-black">
                 {pipelineColumns.map((column) => (
-                  <div key={column.status} className="p-4">
+                  <div key={column.status} className="p-4 bg-white hover:bg-gray-50 transition-colors">
                     <div className="flex items-center justify-between mb-4">
-                      <span className="text-sm font-medium">{column.title}</span>
-                      <span className="font-mono text-lg font-bold">{column.count}</span>
+                      <span className="text-[11px] font-black uppercase tracking-tighter">{column.title}</span>
+                      <span className="font-mono text-lg font-black">{column.count}</span>
                     </div>
                     <div className="space-y-2">
-                      {orders
+                      {filteredOrders
                         .filter(o => o.status === column.status)
-                        .slice(0, 5)
+                        .slice(0, 3)
                         .map(order => (
                           <div
                             key={order.id}
-                            className="p-2 bg-gray-50 border border-gray-200 text-xs"
+                            className={`p-2 border border-gray-200 text-[10px] font-black uppercase tracking-tighter bg-gray-50/50 ${order.isVIP ? 'border-yellow-400 bg-yellow-50' : ''}`}
                           >
-                            <div className="font-mono">{order.id}</div>
-                            <div className="text-gray-500 truncate">{order.customer}</div>
+                            <div className="font-mono text-gray-400">{order.id}</div>
+                            <div className="truncate">{order.customer}</div>
                           </div>
                         ))}
-                      {column.count > 5 && (
-                        <div className="text-xs text-gray-400 text-center py-1">
-                          +{column.count - 5} more
-                        </div>
-                      )}
                     </div>
                   </div>
                 ))}
