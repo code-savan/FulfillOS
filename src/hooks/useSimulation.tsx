@@ -167,7 +167,6 @@ export function EngineProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const currentSpeedRef = useRef(1000); // 1s Engine Tick
 
   useEffect(() => {
     const state = useStore.getState();

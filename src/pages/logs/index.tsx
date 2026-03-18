@@ -1,4 +1,3 @@
-import { useNavigate } from 'react-router-dom';
 import { useStore } from '@/store';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
@@ -12,7 +11,6 @@ const logTypeConfig: Record<string, { label: string; bgColor: string; textColor:
 };
 
 export default function LogsPage() {
-  const navigate = useNavigate();
   const { logs } = useStore();
 
   const groupedLogs = logs.reduce((groups, log) => {
