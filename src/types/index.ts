@@ -74,7 +74,7 @@ export interface Staff {
 export interface LogEntry {
   id: string;
   timestamp: Date;
-  type: 'order' | 'inventory' | 'staff' | 'system' | 'integration';
+  type: 'order' | 'inventory' | 'staff' | 'system' | 'integration' | 'anomaly';
   message: string;
   details?: string;
 }

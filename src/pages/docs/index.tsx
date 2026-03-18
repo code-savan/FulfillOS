@@ -1,6 +1,6 @@
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
-import { Layout, List, Users, Package, Settings, ShieldAlert, CheckCircle } from 'lucide-react';
+import { Layout, List, Users, Package, ShieldAlert, CheckCircle } from 'lucide-react';
 
 export default function DocsPage() {
   return (
@@ -25,23 +25,23 @@ export default function DocsPage() {
             <hr className="border-t-4 border-black w-24" />
 
             {/* The Engine Concept */}
-            <section className="bg-black text-white p-12 shadow-[8px_8px_0px_0px_rgba(156,163,175,1)]">
+            <section className="bg-black text-white p-12 shadow-[12px_12px_0px_0px_rgba(31,41,55,1)]">
               <div className="flex items-start gap-8">
                 <div className="shrink-0 w-16 h-16 border-2 border-white flex items-center justify-center font-black text-2xl">01</div>
                 <div className="space-y-6">
                   <h2 className="text-3xl font-bold uppercase tracking-widest">The "Start Engine" Concept</h2>
                   <p className="text-gray-400 text-lg leading-relaxed">
                     Instead of manually managing every person and paper trail, you simply **"Start the Engine."** 
-                    Our system takes full control of your orders, automatically assigning them to the right staff member at the right time.
+                    Our system takes full control of your orders, automatically assigning them to the right staff member at the right time across all nodes (warehouses).
                   </p>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8 pt-4">
                     <div className="space-y-2">
-                      <h4 className="font-bold text-yellow-400 flex items-center gap-2 underline">PREVENTS HUMAN ERROR</h4>
-                      <p className="text-sm text-gray-300">The engine knows exactly what is in stock. It won't let a picker look for an item that isn't there.</p>
+                      <h4 className="font-bold text-yellow-500 flex items-center gap-2 underline uppercase tracking-tighter">Automatic Labor Calculations</h4>
+                      <p className="text-sm text-gray-400 font-medium">The engine tracks the exact second a picker starts and finishes a task. It then calculates your **Labor Burn** and **Gross Margin** automatically, so you know exactly how profitable each shipment is.</p>
                     </div>
                     <div className="space-y-2">
-                      <h4 className="font-bold text-yellow-400 flex items-center gap-2 underline">SAVES ADMIN TIME</h4>
-                      <p className="text-sm text-gray-300">No more manual assignment. The engine detects who is idle and pushes the highest priority work to them instantly.</p>
+                      <h4 className="font-bold text-yellow-500 flex items-center gap-2 underline uppercase tracking-tighter">Multi-Warehouse Routing</h4>
+                      <p className="text-sm text-gray-400 font-medium">Got more than one location? The engine automatically routes orders to the warehouse (Node) closest to the customer to save you on shipping transit costs.</p>
                     </div>
                   </div>
                 </div>
@@ -55,77 +55,151 @@ export default function DocsPage() {
               <div className="grid grid-cols-1 gap-16">
                 
                 {/* Dashboard */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12 border-b border-black/5">
                   <div className="md:col-span-1 space-y-4">
                     <div className="w-12 h-12 border-2 border-black flex items-center justify-center rounded-lg">
                       <Layout className="w-6 h-6" />
                     </div>
                     <h3 className="text-2xl font-bold uppercase">Dashboard</h3>
-                    <p className="text-sm text-gray-500 italic">"The Bird's Eye View"</p>
+                    <p className="text-sm text-gray-400 font-black uppercase tracking-widest italic">"The Global Command Center"</p>
                   </div>
-                  <div className="md:col-span-2 text-gray-700 leading-relaxed">
-                    The health of your business in one screen. Use this to see how many orders are going out today, check your staff efficiency, and spot stock levels that are dangerously low.
+                  <div className="md:col-span-2 text-gray-700 leading-relaxed font-medium">
+                    The health of your entire network in one screen. Switch between **Node 01 (North)** and **Node 02 (West)** to see local activity. View your "Live Revenue" and the "Engine Heartbeat" to ensure the warehouse is humming correctly.
                   </div>
                 </div>
 
                 {/* Orders */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12 border-b border-black/5">
                   <div className="md:col-span-1 space-y-4">
                     <div className="w-12 h-12 border-2 border-black flex items-center justify-center rounded-lg">
                       <List className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold uppercase">Orders</h3>
-                    <p className="text-sm text-gray-500 italic">"Autonomous Workflow Tracker"</p>
+                    <h3 className="text-2xl font-bold uppercase">Orders Ledger</h3>
+                    <p className="text-sm text-gray-400 font-black uppercase tracking-widest italic">"Stable selection system"</p>
                   </div>
-                  <div className="md:col-span-2 text-gray-700 leading-relaxed">
-                    Watch the Engine move orders from **Pending** to **Shipped** in real-time. 
-                    If the system detects a problem (like a damaged item), it will flag a **"System Anomaly"** (red border) so you can step in only when needed.
+                  <div className="md:col-span-2 text-gray-700 leading-relaxed font-medium">
+                    We've split the view to make your life easier. The **Master Ledger** is a stable list where you can find any order without it jumping around. The **Live Flow** is the fast-moving heart of the warehouse where you watch the robotics and staff handle shipments in real-time.
                   </div>
                 </div>
 
                 {/* Inventory */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12 border-b border-black/5">
                   <div className="md:col-span-1 space-y-4">
                     <div className="w-12 h-12 border-2 border-black flex items-center justify-center rounded-lg">
                       <Package className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold uppercase">Inventory</h3>
-                    <p className="text-sm text-gray-500 italic">"Stock & Compliance"</p>
+                    <h3 className="text-2xl font-bold uppercase">Stock Integrity</h3>
+                    <p className="text-sm text-gray-400 font-black uppercase tracking-widest italic">"Predictive Analytics"</p>
                   </div>
-                  <div className="md:col-span-2 text-gray-700 leading-relaxed">
-                    The Engine keeps your stock levels 100% accurate. When an item is "Picked," the count is reduced instantly. You get a alert when you need to reorder.
+                  <div className="md:col-span-2 text-gray-700 leading-relaxed font-medium">
+                    The engine gives you **"Runway Days"** for your stock. Instead of just a quantity, it tells you exactly when you will run out based on current sales speed. High-accuracy tracking prevents you from overselling and disappointing your clients.
                   </div>
                 </div>
 
-                {/* Staff */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Picker Mode */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 pb-12 border-b border-black/5">
                   <div className="md:col-span-1 space-y-4">
-                    <div className="w-12 h-12 border-2 border-black flex items-center justify-center rounded-lg">
+                    <div className="w-12 h-12 border-2 border-black flex items-center justify-center rounded-lg bg-black text-white">
                       <Users className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold uppercase">Staff</h3>
-                    <p className="text-sm text-gray-500 italic">"Human Capital Management"</p>
+                    <h3 className="text-2xl font-bold uppercase">Picker Mode</h3>
+                    <p className="text-sm text-gray-400 font-black uppercase tracking-widest italic">"Staff Smartphone View"</p>
                   </div>
-                  <div className="md:col-span-2 text-gray-700 leading-relaxed">
-                    See who is working and who is idle. If you have too many "Packers" sitting around, you can reassign them to "Pickers" with one click to keep the workflow moving.
+                  <div className="md:col-span-2 text-gray-700 leading-relaxed font-medium">
+                    Your staff can use our dedicated **Mobile Interface**. It acts as a handheld scanner that guides them to the exact aisle (e.g., A-12) and requires a "Scan SKU" confirmation before an item can be marked as picked—eliminating picking errors by 99%.
                   </div>
                 </div>
 
-                {/* Settings */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {/* Audit Trail */}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 border-b border-black/5 pb-12">
                   <div className="md:col-span-1 space-y-4">
                     <div className="w-12 h-12 border-2 border-black flex items-center justify-center rounded-lg">
-                      <Settings className="w-6 h-6" />
+                      <ShieldAlert className="w-6 h-6" />
                     </div>
-                    <h3 className="text-2xl font-bold uppercase">Engine Controls</h3>
-                    <p className="text-sm text-gray-500 italic">"Dialing In Growth"</p>
+                    <h3 className="text-2xl font-bold uppercase">Activity Audit</h3>
+                    <p className="text-sm text-gray-400 font-black uppercase tracking-widest italic">"Every Decision Logged"</p>
                   </div>
-                  <div className="md:col-span-2 text-gray-700 leading-relaxed">
-                    This is where you sync with **Shopify** or **FedEx**. You can also "Overclock" the engine to see how your warehouse would handle 5x more orders during the holidays.
+                  <div className="md:col-span-2 text-gray-700 leading-relaxed font-medium">
+                    The Engine keeps a **Detailed Audit Trail**. You can click any event to see its "Extended Metadata." This is perfect for insurance purposes or resolving disputes, as it shows the "Execution Trace" of exactly what happened during fulfillment.
                   </div>
                 </div>
 
               </div>
+            </section>
+
+            {/* Profits & Efficiency - THE BOTTOM LINE */}
+            <section className="bg-white border-4 border-black p-12 shadow-[16px_16px_0px_0px_rgba(0,0,0,1)] space-y-12">
+              <div className="space-y-4">
+                <h2 className="text-5xl font-black uppercase tracking-tighter leading-none underline decoration-8 underline-offset-8">
+                    The Bottom Line: <br/><span className="text-gray-400">Profit Maximization</span>
+                </h2>
+                <p className="text-lg font-medium text-gray-500 italic">
+                    "FulfillOS isn't just software; it's a profit-generating machine. Every feature below is designed to lower your 'Burn Rate' and increase your 'Gross Margin'."
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+                <div className="space-y-4 border-l-4 border-black pl-8">
+                  <h4 className="font-black text-xl uppercase tracking-widest">01 / Zero-Waste Labor</h4>
+                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
+                    Most warehouses lose 15-20% of their payroll to "Walking Time"—staff looking for their next task. Our **Autonomous Engine** pushes the next task to their smartphone before they've even finished the current one. **Idle time is eliminated.**
+                  </p>
+                </div>
+                <div className="space-y-4 border-l-4 border-black pl-8">
+                  <h4 className="font-black text-xl uppercase tracking-widest">02 / Predictive Inventory</h4>
+                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
+                    Dead stock is a cash killer. Our **Runway Days** technology tells you when to liquidate slow-moving items and exactly when to reorder high-velocity items, freeing up thousands in locked-up capital.
+                  </p>
+                </div>
+                <div className="space-y-4 border-l-4 border-black pl-8">
+                  <h4 className="font-black text-xl uppercase tracking-widest">03 / Smart Batch Routing</h4>
+                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
+                    The Engine's **Geo-Intelligence** automatically routes shipments to the "Node" closest to the customer. This can save an average of **$1.40 per box** in transit costs alone—adding up to massive monthly savings.
+                  </p>
+                </div>
+                <div className="space-y-4 border-l-4 border-black pl-8">
+                  <h4 className="font-black text-xl uppercase tracking-widest">04 / Return-Kill Mode</h4>
+                  <p className="text-sm text-gray-600 font-medium leading-relaxed">
+                    Incorrect shipments are the hidden cost of e-commerce. By requiring **Digital SKU Verification** in the Picker Mode, we stop errors before the box is taped shut. No more "wrong item" returns.
+                  </p>
+                </div>
+              </div>
+
+              <div className="pt-8 border-t-2 border-dashed border-gray-200">
+                <div className="bg-gray-50 p-6 flex items-center justify-between border-2 border-black">
+                    <div className="text-sm font-black uppercase tracking-widest">Estimated ROI for High Volume User</div>
+                    <div className="text-3xl font-black text-green-600">+$12.4k / MON</div>
+                </div>
+              </div>
+            </section>
+
+            {/* Who is this for? */}
+            <section className="bg-black text-white p-12 shadow-[12px_12px_0px_0px_rgba(75,85,99,1)] space-y-12">
+                <h2 className="text-4xl font-black uppercase tracking-tighter">Who is FulfillOS For?</h2>
+                
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-sm">
+                    <div className="space-y-4">
+                        <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-black">A</div>
+                        <h4 className="font-bold uppercase tracking-widest text-yellow-500">Multi-Warehouse Owners</h4>
+                        <p className="text-gray-400 font-medium leading-relaxed">
+                            If you manage inventory across multiple regions (e.g., North and West Nodes), you need an "Engine" to make routing decisions for you. We handle the complexity of multi-site logistics.
+                        </p>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-black">B</div>
+                        <h4 className="font-bold uppercase tracking-widest text-yellow-500">Scale-Ready E-commerce</h4>
+                        <p className="text-gray-400 font-medium leading-relaxed">
+                            For brands doing 500 to 5,000 orders per day. Our system is designed to handle "Holiday Spikes" (5x volume) without you needing to hire more administrative staff.
+                        </p>
+                    </div>
+                    <div className="space-y-4">
+                        <div className="w-10 h-10 bg-white text-black flex items-center justify-center font-black">C</div>
+                        <h4 className="font-bold uppercase tracking-widest text-yellow-500">Efficiency-First Managers</h4>
+                        <p className="text-gray-400 font-medium leading-relaxed">
+                            Managers who want to see their **Gross Margin** and **Labor Burn** in real-time. If you believe "you can't manage what you don't measure," FulfillOS is your primary weapon.
+                        </p>
+                    </div>
+                </div>
             </section>
 
             {/* Quick Intervention */}
@@ -135,13 +209,13 @@ export default function DocsPage() {
                 Emergency Interventions
               </h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-8 text-sm">
-                <div className="space-y-2">
-                  <h4 className="font-bold flex items-center gap-2"><CheckCircle className="w-4 h-4" /> MARK AS VIP</h4>
-                  <p>In the Orders page, click any order to mark it as VIP. The Engine will immediately stop other work and force a staff member to prioritize this client.</p>
+                <div className="space-y-2 font-medium">
+                  <h4 className="font-bold flex items-center gap-2 uppercase tracking-tighter leading-none"><CheckCircle className="w-4 h-4" /> MARK AS VIP</h4>
+                  <p className="text-gray-500">Force the Engine to prioritize a specific client. This temporarily halts other work to ensure your best customers get 5-minute shipment processing.</p>
                 </div>
-                <div className="space-y-2">
-                  <h4 className="font-bold flex items-center gap-2"><CheckCircle className="w-4 h-4" /> ENGINE TOGGLE</h4>
-                  <p>In the top bar, you can stop the Engine at any time. This pauses all automated assignments if you need to perform a manual inventory count.</p>
+                <div className="space-y-2 font-medium">
+                  <h4 className="font-bold flex items-center gap-2 uppercase tracking-tighter leading-none"><CheckCircle className="w-4 h-4" /> ENGINE SPEED</h4>
+                  <p className="text-gray-500">Use the Settings to "Speed Up" the internal clock. This is used for stress-testing your warehouse capacity during peak seasons without hiring more staff yet.</p>
                 </div>
               </div>
             </section>

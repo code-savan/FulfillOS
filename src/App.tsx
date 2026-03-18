@@ -10,6 +10,7 @@ import InventoryPage from '@/pages/inventory';
 import StaffPage from '@/pages/staff';
 import AnalyticsPage from '@/pages/analytics';
 import LogsPage from '@/pages/logs';
+import LogDetailPage from '@/pages/logs/LogDetail';
 import SettingsPage from '@/pages/settings';
 import DocsPage from '@/pages/docs';
 import PickerPage from '@/pages/picker';
@@ -60,7 +61,8 @@ function App() {
             <Route path="/inventory/*" element={<ProtectedRoute><InventoryPage /></ProtectedRoute>} />
             <Route path="/staff/*" element={<ProtectedRoute><StaffPage /></ProtectedRoute>} />
             <Route path="/analytics/*" element={<ProtectedRoute><AnalyticsPage /></ProtectedRoute>} />
-            <Route path="/logs/*" element={<ProtectedRoute><LogsPage /></ProtectedRoute>} />
+            <Route path="/logs" element={<ProtectedRoute><LogsPage /></ProtectedRoute>} />
+            <Route path="/logs/:id" element={<ProtectedRoute><LogDetailPage /></ProtectedRoute>} />
             <Route path="/settings/*" element={<ProtectedRoute><SettingsPage /></ProtectedRoute>} />
             <Route path="/docs/*" element={<ProtectedRoute><DocsPage /></ProtectedRoute>} />
             <Route path="/picker" element={<ProtectedRoute><PickerPage /></ProtectedRoute>} />

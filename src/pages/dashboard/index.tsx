@@ -110,8 +110,8 @@ export default function DashboardPage() {
                 </div>
             </div>
 
-            {/* KPI Strip */}
-            <div className="grid grid-cols-4 gap-0 border-4 border-black bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+            {/* KPI Strip (INTRO - BOLD) */}
+            <div className="grid grid-cols-4 gap-0 border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
               {kpis.map((kpi, index) => (
                 <div
                   key={kpi.label}

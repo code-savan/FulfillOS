@@ -109,14 +109,14 @@ export default function OrdersPage() {
                         </select>
                     </div>
 
-                    <div className="border-4 border-black bg-white shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden">
-                        <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b-2 border-black bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
+                    <div className="border border-black bg-white overflow-hidden">
+                        <div className="grid grid-cols-12 gap-4 px-6 py-4 border-b border-black bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
                             <div className="col-span-3">Entity ID</div>
                             <div className="col-span-5">Identity / Designation</div>
                             <div className="col-span-2 text-right">Valuation</div>
                             <div className="col-span-2 text-right">State</div>
                         </div>
-                        <div className="divide-y-2 divide-black max-h-[600px] overflow-auto custom-scrollbar">
+                        <div className="divide-y divide-black max-h-[600px] overflow-auto custom-scrollbar">
                             {filteredOrders.length === 0 ? (
                                 <div className="px-4 py-12 text-center text-gray-400 text-xs uppercase font-black italic">
                                     No records matching active filter.
@@ -155,7 +155,7 @@ export default function OrdersPage() {
                         <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.5)]"></div>
                     </div>
 
-                    <div className="p-6 border-4 border-black bg-black text-white shadow-[8px_8px_0px_0px_rgba(0,0,0,0.2)] space-y-4">
+                    <div className="p-6 border border-black bg-black text-white space-y-4">
                         <p className="text-[10px] font-bold text-gray-500 uppercase tracking-widest leading-relaxed">
                             Orders currently being processed by the autonomous robotic core and warehouse staff.
                         </p>

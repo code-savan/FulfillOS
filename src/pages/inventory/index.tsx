@@ -162,8 +162,8 @@ export default function InventoryPage() {
               </label>
             </div>
 
-            {/* Inventory Table */}
-            <div className="border-4 border-black overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] bg-white">
+            {/* Inventory Table (NORMAL BORDER) */}
+            <div className="border border-black overflow-hidden bg-white">
               <div className="grid grid-cols-12 gap-4 px-4 py-3 border-b border-black bg-gray-50 text-[10px] font-black uppercase tracking-widest text-gray-400">
                 <div className="col-span-1">Node</div>
                 <div className="col-span-2">SKU ID</div>

@@ -1,7 +1,7 @@
 import { useStore } from '@/store';
 import Sidebar from '@/components/layout/Sidebar';
 import Topbar from '@/components/layout/Topbar';
-
+import { useNavigate } from 'react-router-dom';
 
 const logTypeConfig: Record<string, { label: string; bgColor: string; textColor: string }> = {
   order: { label: 'ORDER', bgColor: 'bg-black', textColor: 'text-white' },
@@ -13,6 +13,7 @@ const logTypeConfig: Record<string, { label: string; bgColor: string; textColor:
 };
 
 export default function LogsPage() {
+  const navigate = useNavigate();
   const { logs } = useStore();
 
   const getLogConfig = (type: string) => logTypeConfig[type] || { label: 'LOG', bgColor: 'bg-gray-100', textColor: 'text-gray-600' };
@@ -76,7 +77,11 @@ export default function LogsPage() {
                         {dayLogs.map((log) => {
                           const config = getLogConfig(log.type);
                           return (
-                            <div key={log.id} className="px-6 py-4 hover:bg-gray-50 transition-colors">
+                            <div 
+                              key={log.id} 
+                              onClick={() => navigate(`/logs/${log.id}`)}
+                              className="px-6 py-4 hover:bg-gray-50 transition-colors cursor-pointer group"
+                            >
                               <div className="flex items-start gap-6">
                                 <span className={`w-16 h-6 flex items-center justify-center text-[9px] font-black uppercase tracking-widest ${config.bgColor} ${config.textColor}`}>
                                   {config.label}
